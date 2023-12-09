@@ -64,17 +64,32 @@ public final class MusicGroupImpl implements MusicGroup {
 
     @Override
     public OptionalDouble averageDurationOfSongs(final String albumName) {
-        return null;
+        return OptionalDouble.of(
+                songs.stream()
+                .filter(x -> x.getAlbumName().isPresent())
+                .filter(x -> x.getAlbumName().get().equals(albumName))
+                .map(x -> x.getDuration())
+                .reduce((x , y) -> x + y)
+                .get()/countSongs(albumName)
+            );
     }
 
+    
     @Override
     public Optional<String> longestSong() {
-        return null;
+        return songs.stream()
+            .max((x,y) -> Double.compare(x.getDuration(),y.getDuration()))
+            .map(x -> Optional.of(x.songName))
+            .get();
     }
 
     @Override
     public Optional<String> longestAlbum() {
-        return null;
+        return albumNames()
+            .max((x,y) -> Double.compare(
+                    averageDurationOfSongs(x).getAsDouble(), 
+                    averageDurationOfSongs(y).getAsDouble())
+                );
     }
 
     private static final class Song {
